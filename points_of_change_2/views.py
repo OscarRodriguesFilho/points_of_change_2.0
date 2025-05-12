@@ -1,0 +1,54 @@
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+
+from django.http import HttpResponse
+
+from .models import Tarefa
+from django.contrib.auth.decorators import login_required
+# Create your views here.
+# É aqui que ficarão as funções que você criou
+
+@login_required
+def index(request):
+    # isso pega todas as tarefas
+
+    all_notes = Tarefa.objects.filter(author=request.user.id).order_by("data")
+    if request.method == 'POST':
+        author = request.user
+        tarefa = request.POST.get('tarefa')
+        pontos = request.POST.get('pontos')
+        task = Tarefa(tarefa = tarefa, pontos = pontos, author = author)
+        task.save()
+       
+    pnts_tot =  0
+    for tarefa in all_notes:
+        if tarefa.estado == 1:
+            pnts_tot += tarefa.pontos
+
+    return render(request, 'paginas/index.html', {"tarefas": all_notes, 'pontos': pnts_tot})
+
+def apagar(request, id_tarefa):
+    tarefa = get_object_or_404(Tarefa, id=id_tarefa, author=request.user)
+    tarefa.delete()
+    return redirect('index')
+    
+def graficos(request):
+    all_notes = Tarefa.objects.filter(author=request.user.id).order_by("data")
+    pnts_tot =  0
+    for tarefa in all_notes:
+        if tarefa.estado == 1:
+            pnts_tot += tarefa.pontos
+    return render(request, 'paginas/graficos.html', {"pontos": pnts_tot})
+
+def estado(request, id_tarefa):
+    tarefa = get_object_or_404(Tarefa, id=id_tarefa, author=request.user)
+    if tarefa.estado == 0:
+        tarefa.estado = 1
+        tarefa.save()
+    else:
+        tarefa.estado = 0
+        tarefa.save()
+    tarefa.save()
+    return redirect('index')
+
+
+        

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador de Tarefas</title>
+
+</head>
+<body>
+  <h1>{{pontos}}</h1>
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+    <button type="submit">Sair</button>
+    </form>
+  
+    <form method="post" action="/">
+      {% csrf_token %}
+    <input type="text" id="taskInput" placeholder="Digite a tarefa" name="tarefa"/>
+    <input type="number" id="scoreInput" placeholder="Pontuação" min="0" name="pontos"/>
+    <button id="addButton">Adicionar</button>
+    </form>
+
+    {% for tarefa in tarefas %}
+        <div>
+        <input
+          value="{{ tarefa.tarefa }}"
+          required
+        />
+        <input
+          value="{{ tarefa.pontos }}"
+          required
+        />
+        <a href="anotacoes/{{tarefa.id}}/apagar">  <button> Deletar</button>  </a>
+        <a href="anotacoes/{{tarefa.id}}/estado"> <button> Feita </button> </a>
+        </div>
+      {% endfor %}
+
+
+</body>
+</html>
