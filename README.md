@@ -1,4 +1,6 @@
 # points_of_change_2.0
+O meu maior problema foi não saber o que o action="/" fazia
+
 python manage.py makemigrations.
 python manage.py runserver
 Coisas cridas: 
