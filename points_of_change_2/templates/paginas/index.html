@@ -8,6 +8,7 @@
 </head>
 <body>
   <h1>{{pontos}}</h1>
+  <h2> Histórico de tarefas</h2>
   
     <form action="{% url 'logout' %}" method="post">
       {% csrf_token %}
@@ -43,8 +44,9 @@
       <a href="tipo/{{tipo}}">  {{tipo}}  </a>
       {% endfor %}
       </form>
+      <a href="nova_tarefa/">  Criar tarefa  </a>
 
-      </ul>
+
 
 
 </body>

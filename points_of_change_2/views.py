@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 
 from django.http import HttpResponse
 
-from .models import Tarefa
+from .models import Tarefa, Novo_tipo
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 # É aqui que ficarão as funções que você criou
@@ -21,7 +21,6 @@ def registro(request):
         form = RegistroForm()
     return render(request, 'paginas/registro.html', {'form': form})
 
-
 @login_required
 def index(request):
     # isso pega todas as tarefas
@@ -39,9 +38,10 @@ def index(request):
         if tarefa.estado == 1:
             pnts_tot += tarefa.pontos
             # isso retorna a hora da tarefa
-        if tarefa.tipo not in lista:
-            lista.append(tarefa.tipo)
     
+    tipos = Novo_tipo.objects.filter(author=request.user.id)
+    for tipo in tipos:
+        lista.append(tipo.nome)
 
     return render(request, 'paginas/index.html', {"tarefas": all_notes, 'pontos': pnts_tot, 'lista': lista})
 
@@ -57,6 +57,7 @@ def tarefa(request, tipo):
         task = Tarefa(tarefa = tarefa, pontos = pontos, author = author, tipo = tipo)
         task.save()
 
+    
     lista = []
     pnts_tot =  0
     for tarefa in all_notes:
@@ -71,11 +72,25 @@ def tarefa(request, tipo):
     return render(request, 'paginas/tarefa.html', {"tarefas": all_notes, 'pontos': pnts_tot, 'lista': lista})
 
 @login_required
+def nova_tarefa(request):
+    if request.method == 'POST':
+        author = request.user
+        nome = request.POST.get('nome')
+        meta = request.POST.get('meta')
+        novo_tipo = Novo_tipo(nome = nome, meta = meta, author = author)
+        novo_tipo.save()
+
+    return render(request, 'paginas/nova_tarefa.html')
+
+@login_required
 def apagar(request, id_tarefa):
     tarefa = get_object_or_404(Tarefa, id=id_tarefa, author=request.user)
+    tipo = tarefa.tipo
     tarefa.delete()
-    return redirect('index')
+    url = '/tipo/' + tipo
+    return redirect(url)
     
+@login_required
 def graficos(request):
     all_notes = Tarefa.objects.filter(author=request.user.id).order_by("data")
     pnts_tot =  0
@@ -85,6 +100,7 @@ def graficos(request):
             
     return render(request, 'paginas/graficos.html', {"pontos": pnts_tot})
 
+@login_required
 def estado(request, id_tarefa):
     tarefa = get_object_or_404(Tarefa, id=id_tarefa, author=request.user)
     if tarefa.estado == 0:
@@ -93,7 +109,9 @@ def estado(request, id_tarefa):
     else:
         tarefa.estado = 0
         tarefa.save()
-    return redirect('index')
+    tipo = tarefa.tipo
+    url = '/tipo/' + tipo
+    return redirect(url)
 
 
         

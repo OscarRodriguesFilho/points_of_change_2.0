@@ -31,3 +31,8 @@ class Tarefa(models.Model):
     def __str__(self):
         status = '✔' if self.estado else '✖'
         return f"{status} {self.tarefa[:50]} ({self.pontos} pts)"
+
+class Novo_tipo(models.Model):
+    author = models.ForeignKey("auth.User", on_delete=models.CASCADE,  default=1)
+    nome = models.TextField(verbose_name='Descrição da lista')
+    meta = models.PositiveIntegerField(verbose_name='Meta')
