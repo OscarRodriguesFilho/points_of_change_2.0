@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Cadastro</title></head>
+<body>
+  <h1>Cadastre-se</h1>
+  {% for msg in messages %}
+    <p style="color:green">{{ msg }}</p>
+  {% endfor %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Registrar</button>
+  </form>
+</body>
+</html>

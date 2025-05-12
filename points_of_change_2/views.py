@@ -6,6 +6,22 @@ from .models import Tarefa
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 # É aqui que ficarão as funções que você criou
+from django.shortcuts import render, redirect
+from .forms import RegistroForm
+from django.contrib import messages
+
+def registro(request):
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Conta criada com sucesso! Faça login.')
+            return redirect('login')  # nome da sua view de login
+    else:
+        form = RegistroForm()
+    return render(request, 'paginas/registro.html', {'form': form})
+
+
 
 @login_required
 def index(request):
@@ -23,6 +39,11 @@ def index(request):
     for tarefa in all_notes:
         if tarefa.estado == 1:
             pnts_tot += tarefa.pontos
+            # isso retorna a hora da tarefa
+            print(tarefa.data.hour)
+            print(tarefa.data.year)
+            print(tarefa.data.month)
+            
 
     return render(request, 'paginas/index.html', {"tarefas": all_notes, 'pontos': pnts_tot})
 
@@ -37,6 +58,7 @@ def graficos(request):
     for tarefa in all_notes:
         if tarefa.estado == 1:
             pnts_tot += tarefa.pontos
+            
     return render(request, 'paginas/graficos.html', {"pontos": pnts_tot})
 
 def estado(request, id_tarefa):
@@ -47,7 +69,6 @@ def estado(request, id_tarefa):
     else:
         tarefa.estado = 0
         tarefa.save()
-    tarefa.save()
     return redirect('index')
 
 
