@@ -31,18 +31,17 @@
           value="{{ tarefa.pontos }}"
           required
         />
-        <a href="anotacoes/{{tarefa.id}}/apagar">  <button> Deletar</button>  </a>
-        <a href="anotacoes/{{tarefa.id}}/estado"> <button> Feita </button> </a>
+        <a href="/anotacoes/{{tarefa.id}}/apagar/">  <button> Deletar</button>  </a>
+        <a href="/anotacoes/{{tarefa.id}}/estado/"> <button> Feita </button> </a>
         </div>
       {% endfor %}
 
       <ul>
  
-      <form method="get" >
       {% for tipo in lista%}
-      <a href="tipo/{{tipo}}">  {{tipo}}  </a>
+      <a href="/tipo/{{tipo}}/">  {{tipo}}  </a>
       {% endfor %}
-      </form>
+  
 
       </ul>
       <a href="/">volar</a>

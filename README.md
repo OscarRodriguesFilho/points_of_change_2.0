@@ -1,5 +1,6 @@
 # points_of_change_2.0
 O meu maior problema foi não saber o que o action="/" fazia
+existe uma diferença enorme entre <a href="/tipo/{{ tipo }}/"> e <a href="tipo/{{ tipo }}">
 
 python manage.py makemigrations.
 python manage.py runserver

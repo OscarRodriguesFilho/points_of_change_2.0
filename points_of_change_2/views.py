@@ -48,6 +48,7 @@ def index(request):
 @login_required
 def tarefa(request, tipo):
     all_notes = Tarefa.objects.filter(author=request.user.id, tipo=tipo).order_by("data")
+    todas = Tarefa.objects.filter(author=request.user.id).order_by("data")
     if request.method == 'POST':
         author = request.user
         tarefa = request.POST.get('tarefa')
@@ -62,6 +63,7 @@ def tarefa(request, tipo):
         if tarefa.estado == 1:
             pnts_tot += tarefa.pontos
             # isso retorna a hora da tarefa
+    for tarefa in todas:
         if tarefa.tipo not in lista:
             lista.append(tarefa.tipo)
     
