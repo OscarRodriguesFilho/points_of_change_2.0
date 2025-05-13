@@ -1,51 +1,268 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Gerenciador de Tarefas</title>
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --accent: #10a37f;
+      --meta-color: #e74c3c;
+      --bg-sidebar: #2f333d;
+      --bg-main: #f0f2f5;
+      --bg-card: #ffffff;
+      --text-main: #202124;
+      --text-light: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html {
+      height: 100%; font-family: sans-serif;
+      color: var(--text-main); background: var(--bg-main);
+    }
 
+    /* Sidebar */
+    nav.sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-width); background: var(--bg-sidebar);
+      color: var(--text-light); padding: 1.5rem 1rem;
+    }
+    nav.sidebar h2 {
+      text-align: center; margin-bottom: 1.5rem; font-size: 1.4rem;
+    }
+    nav.sidebar .tipo-form a {
+      display: block; margin-bottom: .75rem;
+      text-decoration: none; color: var(--text-light);
+      background: rgba(255,255,255,0.1);
+      padding: .5rem; border-radius: var(--border-radius);
+      transition: background .2s;
+    }
+    nav.sidebar .tipo-form a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    nav.sidebar .btn-create,
+    nav.sidebar .btn-logout {
+      display: block; width: 100%; text-align: center;
+      margin-bottom: 1rem; padding: .6rem;
+      background: var(--accent); color: var(--text-light);
+      border: none; border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow); transition: filter .2s;
+      cursor: pointer; text-decoration: none;
+    }
+    nav.sidebar .btn-create:hover,
+    nav.sidebar .btn-logout:hover {
+      filter: brightness(0.9);
+    }
+
+    /* Main */
+    .main {
+      margin-left: var(--sidebar-width); padding: 2rem;
+    }
+
+    /* Scoreboards container */
+    .scoreboards {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .scoreboard {
+      width: 100px; height: 100px; border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      box-shadow: var(--box-shadow);
+      color: var(--text-light);
+      background: var(--bg-card);
+      border: 2px solid transparent;
+      font-weight: 600;
+    }
+    .scoreboard.total {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .scoreboard.meta {
+      background: var(--meta-color);
+      border-color: var(--meta-color);
+    }
+    .scoreboard .value {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+    .scoreboard .label {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .main h2 {
+      text-align: center; margin-bottom: .5rem;
+    }
+    .main .subtitle {
+      text-align: center; color: #555; margin-bottom: 1.5rem;
+    }
+
+    /* Form de criar tarefa */
+    .task-form {
+      display: flex; gap: 1rem; justify-content: center;
+      margin-bottom: 2rem; width: 70%; margin-left: 15%;
+    }
+    .task-form input[type="text"],
+    .task-form input[type="number"],
+    .task-form button {
+      height: 40px;
+    }
+    .task-form input[type="text"] {
+      flex: 1; padding: 0 .75rem;
+      border: 1px solid #ccc; border-radius: var(--border-radius);
+    }
+    .task-form input[type="number"] {
+      width: 100px; padding: 0 .75rem;
+      border: 1px solid #ccc; border-radius: var(--border-radius);
+      text-align: center;
+    }
+    .task-form button {
+      background: var(--accent); color: var(--text-light);
+      border: none; border-radius: var(--border-radius);
+      padding: 0 1.5rem; cursor: pointer;
+      box-shadow: var(--box-shadow); transition: filter .2s;
+    }
+    .task-form button:hover {
+      filter: brightness(0.9);
+    }
+
+    /* Lista de tarefas */
+    .task-list {
+      display: flex; flex-direction: column; gap: 1rem;
+      max-width: 70%; margin: auto;
+    }
+    .task-item {
+      display: flex; align-items: center; gap: 1rem;
+      background: var(--bg-card); padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      transition: background-color .5s ease;
+    }
+    .task-item.feito {
+      background: #e6f4ea;
+    }
+    .task-item .task-desc {
+      flex: 1; padding: 0 .75rem;
+      background: #f5f5f5; border-radius: var(--border-radius);
+      border: none; position: relative;
+    }
+    .task-item .task-desc::after {
+      content: ""; position: absolute;
+      left: 0; top: 50%; height: 2px; width: 0;
+      background: #137333; transition: width .5s ease;
+      transform: translateY(-50%);
+    }
+    .task-item.feito .task-desc::after {
+      width: 100%;
+    }
+    .task-item .task-points {
+      width: 80px; padding: .5rem;
+      background: #e6f4ea; color: #137333;
+      font-weight: bold; text-align: center;
+      border-radius: var(--border-radius); border: none;
+    }
+
+    .task-actions {
+      display: flex; gap: .5rem;
+    }
+    .task-actions .btn-delete,
+    .task-actions .btn-done {
+      border: none; background: var(--accent);
+      color: var(--text-light);
+      padding: .4rem .8rem; border-radius: var(--border-radius);
+      cursor: pointer; box-shadow: var(--box-shadow);
+      transition: filter .2s;
+    }
+    .task-actions .btn-delete:hover {
+      filter: brightness(1.1); background: #d93025;
+    }
+    .task-actions .btn-done:hover {
+      filter: brightness(0.9); background: #137333;
+    }
+
+    /* Voltar */
+    .back-btn {
+      display: block; text-align: center; margin: 2rem auto 0;
+      padding: .6rem 1.2rem; background: #555; color: var(--text-light);
+      text-decoration: none; border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow); transition: filter .2s;
+      width: 15%;
+    }
+    .back-btn:hover {
+      filter: brightness(0.8);
+    }
+  </style>
 </head>
 <body>
-  <h1>{{pontos}}</h1>
-  
-    <form action="{% url 'logout' %}" method="post">
-      {% csrf_token %}
-    <button type="submit">Sair</button>
+
+  <nav class="sidebar">
+    <h2>Tarefas</h2>
+    <form class="tipo-form" method="get">
+      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f">
+        <span style="font-size:1.2rem;vertical-align:middle;">＋</span>
+        Criar tarefa
+      </a>
+      <a href="/graficos/" class="btn-create" style="background-color: #10a37f">Gráficos</a>
+      <a href="/recomendacoes/" class="btn-create" style="background-color: #10a37f">Templates</a>
+      {% for tipo in lista %}
+        <a href="/tipo/{{ tipo }}/" style="text-align: center;">{{ tipo }}</a>
+      {% endfor %}
     </form>
-  
-    <form method="post" >
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
       {% csrf_token %}
-    <input type="text" id="taskInput" placeholder="Digite a tarefa" name="tarefa"/>
-    <input type="number" id="scoreInput" placeholder="Pontuação" min="0" name="pontos"/>
-    <button id="addButton">Adicionar</button>
+      <button type="submit" class="btn-logout" style="margin-top: 30px;">Sair</button>
+    </form>
+  </nav>
+
+  <div class="main">
+
+    <!-- Scoreboards -->
+    <div class="scoreboards">
+      <div class="scoreboard total">
+        <span class="value" id="scoreValue">{{ pontos }}</span>
+        <span class="label">Meta: {{ meta}}</span>
+      </div>
+    </div>
+
+    <p class="subtitle">Clique em “Deletar” ou <strong>Feita</strong> para alternar o estado.</p>
+
+    <form method="post" class="task-form">
+      {% csrf_token %}
+      <input type="text" name="tarefa" placeholder="Digite a tarefa"/>
+      <input type="number" name="pontos" placeholder="Pontuação" min="0"/>
+      <button type="submit">Adicionar</button>
     </form>
 
-    {% for tarefa in tarefas %}
-        <div>
-        <input
-          value="{{ tarefa.tarefa }}"
-          required
-        />
-        <input
-          value="{{ tarefa.pontos }}"
-          required
-        />
-        <a href="/anotacoes/{{tarefa.id}}/apagar">  <button> Deletar</button>  </a>
-        <a href="/anotacoes/{{tarefa.id}}/estado"> <button> Feita </button> </a>
+    <div class="task-list">
+      {% for tarefa in tarefas %}
+        <div class="task-item{% if tarefa.estado == 1 %} feito{% endif %}"
+             data-id="{{ tarefa.id }}"
+             data-score="{{ tarefa.pontos }}">
+          <div class="task-desc">{{ tarefa.tarefa }}</div>
+          <div class="task-points">{{ tarefa.pontos }}</div>
+          <div class="task-actions">
+            <button type="button" class="btn-delete"
+                    onclick="location.href='/anotacoes/{{ tarefa.id }}/apagar'">
+              Deletar
+            </button>
+            <a href="/anotacoes/{{ tarefa.id }}/estado">
+              <button type="button" class="btn-done">Feita</button>
+            </a>
+          </div>
         </div>
       {% endfor %}
+    </div>
 
-      <ul>
- 
-      {% for tipo in lista%}
-      <a href="/tipo/{{tipo}}/">  {{tipo}}  </a>
-      {% endfor %}
-  
-
-      </ul>
-      <a href="/">volar</a>
-
+    <a href="/" class="back-btn">Histórico</a>
+  </div>
 
 </body>
 </html>

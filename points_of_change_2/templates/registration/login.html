@@ -1,25 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login</title>
+  <style>
+    :root {
+      --accent: #10a37f;
+      --bg-main: #f0f2f5;
+      --bg-card: #ffffff;
+      --text-main: #202124;
+      --text-light: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html {
+      height: 100%;
+      font-family: sans-serif;
+      background: var(--bg-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .login-card h2 {
+      color: var(--accent);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .login-card form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+    .form-group label {
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .form-group input {
+      padding: 0.75rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+    }
+    .login-card input[type="submit"],
+    .login-card .register-btn {
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      transition: filter 0.2s;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+    .login-card input[type="submit"] {
+      background: var(--accent);
+      color: var(--text-light);
+    }
+    .login-card input[type="submit"]:hover {
+      filter: brightness(0.9);
+    }
+    .login-card .register-btn {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .login-card .register-btn:hover {
+      background: var(--accent);
+      color: var(--text-light);
+      filter: brightness(0.9);
+    }
+  </style>
 </head>
 <body>
 
-<form method="post" action="{% url 'login' %}">
-  {% csrf_token %}
-  <div>
-    {{ form.username.label_tag }}
-    {{ form.username }}
-  <div>
-  <div>
-    {{ form.password.label_tag }}
-    {{ form.password }}
+  <div class="login-card">
+    <h2>Entrar</h2>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+      </div>
+      <div class="form-group">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <input type="submit" value="Login">
+    </form>
+    <!-- Botão de cadastro -->
+    <a href="/registro/" class="register-btn">Cadastra-se</a>
   </div>
 
-  <input type="submit" value="login">
-  <input type="hidden" name="next" value="{{ next }}">
-</form>
 </body>
 </html>

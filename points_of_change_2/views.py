@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 
 from django.http import HttpResponse
-
+from django.db.models import Sum
 from .models import Tarefa, Novo_tipo
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -42,7 +42,7 @@ def index(request):
     tipos = Novo_tipo.objects.filter(author=request.user.id)
     for tipo in tipos:
         lista.append(tipo.nome)
-
+      
     return render(request, 'paginas/index.html', {"tarefas": all_notes, 'pontos': pnts_tot, 'lista': lista})
 
 @login_required
@@ -57,7 +57,8 @@ def tarefa(request, tipo):
         task = Tarefa(tarefa = tarefa, pontos = pontos, author = author, tipo = tipo)
         task.save()
 
-    
+    p = Novo_tipo.objects.filter(nome=tipo).first()
+    meta = p.meta
     lista = []
     pnts_tot =  0
     for tarefa in all_notes:
@@ -69,7 +70,11 @@ def tarefa(request, tipo):
             lista.append(tarefa.tipo)
     
 
-    return render(request, 'paginas/tarefa.html', {"tarefas": all_notes, 'pontos': pnts_tot, 'lista': lista})
+    return render(request, 'paginas/tarefa.html', {"tarefas": all_notes, 'pontos': pnts_tot, 'lista': lista, 'meta': meta})
+
+@login_required
+def recomendacoes(request):
+    return render(request,'paginas/recomendacoes.html')
 
 @login_required
 def nova_tarefa(request):
@@ -80,7 +85,13 @@ def nova_tarefa(request):
         novo_tipo = Novo_tipo(nome = nome, meta = meta, author = author)
         novo_tipo.save()
 
-    return render(request, 'paginas/nova_tarefa.html')
+    lista = []
+    
+    tipos = Novo_tipo.objects.filter(author=request.user.id)
+    for tipo in tipos:
+        lista.append(tipo.nome)
+
+    return render(request, 'paginas/nova_tarefa.html', {'lista': lista})
 
 @login_required
 def apagar(request, id_tarefa):
@@ -91,14 +102,16 @@ def apagar(request, id_tarefa):
     return redirect(url)
     
 @login_required
-def graficos(request):
-    all_notes = Tarefa.objects.filter(author=request.user.id).order_by("data")
-    pnts_tot =  0
-    for tarefa in all_notes:
-        if tarefa.estado == 1:
-            pnts_tot += tarefa.pontos
-            
-    return render(request, 'paginas/graficos.html', {"pontos": pnts_tot})
+def graficos(request): 
+    qs = Tarefa.objects.filter(author=request.user, estado=1).values('tipo').annotate(total=Sum('pontos')).order_by('tipo')
+    
+    labels = [item['tipo']  for item in qs]
+    data   = [item['total'] for item in qs]
+    return render(request, 'paginas/graficos.html', {
+        'labels': labels,
+        'data':   data,
+    })   
+
 
 @login_required
 def estado(request, id_tarefa):

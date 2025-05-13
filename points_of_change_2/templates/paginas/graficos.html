@@ -1,13 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Gráficos de Tarefas</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --accent: #10a37f;
+      --text-main: #202124;
+      --bg-main: #f0f2f5;
+      --border-radius: 8px;
+      --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: sans-serif;
+      color: var(--text-main);
+      background: var(--bg-main);
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Container do gráfico */
+    .chart-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    /* Botão de voltar */
+    .back-btn {
+      display: block;
+      max-width: 200px;
+      margin: 2rem auto 0;
+      padding: .6rem 1.2rem;
+      background: var(--accent);
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      transition: filter .2s;
+    }
+    .back-btn:hover {
+      filter: brightness(0.9);
+    }
+  </style>
 </head>
 <body>
-   
-    
+
+  <h1>Pontos por Tipo de Tarefa (Feitas)</h1>
+
+  <div class="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <a href="/" class="back-btn">Voltar</a>
+
+  <script>
+    const labels     = {{ labels|safe }};
+    const dataValues = {{ data|safe }};
+
+    new Chart(
+      document.getElementById('myChart'),
+      {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Pontos (Feitas)',
+            data: dataValues,
+            backgroundColor: labels.map(_ => 'rgba(16,163,127,0.5)'),
+            borderColor:     labels.map(_ => 'rgba(16,163,127,1)'),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.parsed.y} pts`
+              }
+            }
+          }
+        }
+      }
+    );
+  </script>
 
 </body>
 </html>

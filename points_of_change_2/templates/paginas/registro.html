@@ -1,15 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"><title>Cadastro</title></head>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cadastro</title>
+  <style>
+    ul{
+      list-style: none;
+    }
+    :root {
+      --accent: #10a37f;
+      --bg-page: #f0f2f5;
+      --bg-card: #ffffff;
+      --text-main: #202124;
+      --border-radius: 8px;
+      --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--bg-page);
+      font-family: sans-serif;
+      color: var(--text-main);
+      padding: 16px;
+    }
+    .card {
+      background: var(--bg-card);
+      padding: 32px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 100%;
+      max-width: 400px;
+    }
+    .card h1 {
+      margin-bottom: 24px;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    .message {
+      background: #e6ffe6;
+      color: #006600;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+    form p {
+      margin-bottom: 16px;
+    }
+    form label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    form input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    form button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    form button:hover {
+      background: #0e8c68;
+    }
+  </style>
+</head>
 <body>
-  <h1>Cadastre-se</h1>
-  {% for msg in messages %}
-    <p style="color:green">{{ msg }}</p>
-  {% endfor %}
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrar</button>
-  </form>
+  <div class="card">
+    <h1 style="color: #10a37f">Cadastre-se</h1>
+    {% for msg in messages %}
+      <p class="message">{{ msg }}</p>
+    {% endfor %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Registrar</button>
+    </form>
+  </div>
 </body>
 </html>

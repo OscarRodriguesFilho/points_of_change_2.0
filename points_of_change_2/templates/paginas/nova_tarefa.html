@@ -1,16 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Criar Lista de Tarefas</title>
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --accent: #10a37f;
+      --bg-sidebar: #2f333d;
+      --bg-main: #f0f2f5;
+      --bg-card: #ffffff;
+      --text-main: #202124;
+      --text-light: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html {
+      height: 100%;
+      font-family: sans-serif;
+      color: var(--text-main);
+      background: var(--bg-main);
+    }
+
+    /* Sidebar */
+    nav.sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--bg-sidebar);
+      color: var(--text-light);
+      padding: 1.5rem 1rem;
+    }
+    nav.sidebar h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+      text-align: center;
+    }
+    nav.sidebar .tipo-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    nav.sidebar .tipo-form a {
+      text-decoration: none;
+      color: var(--text-light);
+      background: rgba(255,255,255,0.1);
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      transition: background 0.2s;
+    }
+    nav.sidebar .tipo-form a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    nav.sidebar .btn-create,
+    nav.sidebar .btn-logout {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+      padding: 0.6rem;
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--accent);
+      color: var(--text-light);
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      transition: filter 0.2s;
+    }
+    nav.sidebar .btn-create:hover,
+    nav.sidebar .btn-logout:hover {
+      filter: brightness(0.9);
+    }
+    nav.sidebar .logout-form button {
+      width: 100%;
+      border: none;
+      background: transparent;
+    }
+
+    /* Main */
+    .main {
+      margin-left: var(--sidebar-width);
+      padding: 2rem;
+    }
+    .main h2 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .main .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Form de criar lista */
+    .task-form {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      width: 70%;
+      margin-left: 15%;
+    }
+    .task-form input[type="text"],
+    .task-form input[type="number"] {
+      padding: 0.75rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      flex: 1;
+    }
+    .task-form input[type="number"] {
+      width: 120px;
+    }
+    .task-form button {
+      background: var(--accent);
+      color: var(--text-light);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      transition: filter 0.2s;
+    }
+    .task-form button:hover {
+      filter: brightness(0.9);
+    }
+
+    /* Botão de voltar */
+    .back-btn {
+      display: block;
+      text-align: center;
+      margin: 2rem auto 0;
+      text-decoration: none;
+      padding: 0.6rem 1.2rem;
+      background: #555;
+      color: var(--text-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      transition: filter 0.2s;
+      width: 15%;
+    }
+    .back-btn:hover {
+      filter: brightness(0.8);
+    }
+  </style>
 </head>
 <body>
-    <form method="post" action="#">
-      {% csrf_token %}
-        <input type="text"  placeholder="Nome da lista" name="nome"/>
-        <input type="number"  placeholder="Meta" min="0" name="meta"/>
-        <button id="addButton" type="submit">Adicionar</button>
+
+  <nav class="sidebar">
+    <h2>Tarefas</h2>
+    <form class="tipo-form" method="get">
+      <a href="/nova_tarefa/" style="background-color: #10a37f"> <span style="font-size:1.2rem;vertical-align:middle;" >＋</span>Criar tarefas</a>
+      <a href="/graficos/" style="background-color: #10a37f"> Gráficos </a>
+      <a href="/recomendacoes/" style="background-color: #10a37f"> Templates </a>
+      {% for tipo in lista %}
+        <a href="/tipo/{{ tipo }}/">{{ tipo }}</a>
+      {% endfor %}
     </form>
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="btn-logout" style="background-color: #10a37f; margin-top: 20px;">Sair</button>
+    </form>
+  </nav>
+
+  <div class="main">
+    <h2>Criar Lista de Tarefas</h2>
+    <p class="subtitle">Preencha abaixo o nome e a meta para a nova lista. Ao concluir, vá na nav bar e adicone pelo menos uma tarefa para valifar a lista</p>
+
+    <form method="post" action="#" class="task-form">
+      {% csrf_token %}
+      <input type="text" name="nome" placeholder="Nome da lista" required />
+      <input type="number" name="meta" placeholder="Meta" min="0" required />
+      <button type="submit">Adicionar</button>
+    </form>
+ 
+
+    <a href="/" class="back-btn">Voltar</a>
+  </div>
+
 </body>
 </html>
