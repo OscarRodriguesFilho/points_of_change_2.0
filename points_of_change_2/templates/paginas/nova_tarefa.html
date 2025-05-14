@@ -32,26 +32,28 @@
       background: var(--bg-sidebar);
       color: var(--text-light);
       padding: 1.5rem 1rem;
+      overflow-y: auto; /* permite rolagem se os links ultrapassarem a altura */
     }
     nav.sidebar h2 {
+      text-align: center;
       margin-bottom: 1.5rem;
       font-size: 1.4rem;
-      text-align: center;
     }
     nav.sidebar .tipo-form {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      margin-bottom: 2rem;
+      margin-bottom: 0.7rem;
     }
     nav.sidebar .tipo-form a {
+      display: block;
       text-decoration: none;
       color: var(--text-light);
       background: rgba(255,255,255,0.1);
       padding: 0.5rem;
       border-radius: var(--border-radius);
       text-align: center;
-      transition: background 0.2s;
+      transition: background .2s;
     }
     nav.sidebar .tipo-form a:hover {
       background: rgba(255,255,255,0.2);
@@ -61,28 +63,23 @@
       display: block;
       width: 100%;
       text-align: center;
-      margin-bottom: 1rem;
-      padding: 0.6rem;
-      border: none;
-      border-radius: var(--border-radius);
+      margin-bottom: 0rem;
+      padding: 0.35rem;
       background: var(--accent);
       color: var(--text-light);
-      text-decoration: none;
-      cursor: pointer;
+      border: none;
+      border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
-      transition: filter 0.2s;
+      transition: filter .2s;
+      cursor: pointer;
+      text-decoration: none;
     }
     nav.sidebar .btn-create:hover,
     nav.sidebar .btn-logout:hover {
       filter: brightness(0.9);
     }
-    nav.sidebar .logout-form button {
-      width: 100%;
-      border: none;
-      background: transparent;
-    }
 
-    /* Main */
+    /* Main content */
     .main {
       margin-left: var(--sidebar-width);
       padding: 2rem;
@@ -125,7 +122,7 @@
       padding: 0 1.5rem;
       cursor: pointer;
       box-shadow: var(--box-shadow);
-      transition: filter 0.2s;
+      transition: filter .2s;
     }
     .task-form button:hover {
       filter: brightness(0.9);
@@ -134,16 +131,16 @@
     /* Botão de voltar */
     .back-btn {
       display: block;
-      text-align: center;
+      max-width: 200px;
       margin: 2rem auto 0;
-      text-decoration: none;
       padding: 0.6rem 1.2rem;
       background: #555;
       color: var(--text-light);
+      text-align: center;
+      text-decoration: none;
       border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
-      transition: filter 0.2s;
-      width: 15%;
+      transition: filter .2s;
     }
     .back-btn:hover {
       filter: brightness(0.8);
@@ -154,34 +151,39 @@
 
   <nav class="sidebar">
     <h2>Tarefas</h2>
-    <form class="tipo-form" method="get">
-      <a href="/nova_tarefa/" style="background-color: #10a37f"> <span style="font-size:1.2rem;vertical-align:middle;" >＋</span>Criar tarefas</a>
-      <a href="/graficos/" style="background-color: #10a37f"> Gráficos </a>
-      <a href="/recomendacoes/" style="background-color: #10a37f"> Templates </a>
+    <div class="tipo-form">
+      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f">
+         + Criar tarefa
+      </a>
+      <a href="/graficos/" class="btn-create" style="background-color: #10a37f">Gráficos</a>
+      <a href="/recomendacoes/" class="btn-create" style="background-color: #10a37f">Templates</a>
       {% for tipo in lista %}
-        <a href="/tipo/{{ tipo }}/">{{ tipo }}</a>
+        <a href="/tipo/{{ tipo }}/" style="text-align: left;">{{ tipo }}</a>
       {% endfor %}
-    </form>
-    <form action="{% url 'logout' %}" method="post" class="logout-form">
+    </div>
+    <form action="{% url 'logout' %}" method="post" >
       {% csrf_token %}
-      <button type="submit" class="btn-logout" style="background-color: #10a37f; margin-top: 20px;">Sair</button>
+      <button type="submit" class="btn-logout" style="padding: 10px;">Sair</button>
     </form>
   </nav>
 
   <div class="main">
     <h2>Criar Lista de Tarefas</h2>
-    <p class="subtitle">Preencha abaixo o nome e a meta para a nova lista. Ao concluir, vá na nav bar e adicone pelo menos uma tarefa para valifar a lista</p>
+    <p class="subtitle">
+      Preencha abaixo o nome e a meta para a nova lista.
+      Depois, use a nav bar para adicionar tarefas e validar sua lista.
+    </p>
 
     <form method="post" action="#" class="task-form">
       {% csrf_token %}
       <input type="text" name="nome" placeholder="Nome da lista" required />
-      <input type="number" name="meta" placeholder="Meta" min="0" required />
+      <input type="number" name="meta" placeholder="Meta: atribua uma pontuação para sua lista" min="0" required />
       <button type="submit">Adicionar</button>
     </form>
- 
 
     <a href="/" class="back-btn">Voltar</a>
   </div>
 
 </body>
 </html>
+

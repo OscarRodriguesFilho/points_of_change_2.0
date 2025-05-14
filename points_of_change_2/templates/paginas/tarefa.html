@@ -8,7 +8,6 @@
     :root {
       --sidebar-width: 220px;
       --accent: #10a37f;
-      --meta-color: #e74c3c;
       --bg-sidebar: #2f333d;
       --bg-main: #f0f2f5;
       --bg-card: #ffffff;
@@ -17,26 +16,32 @@
       --border-radius: 8px;
       --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body, html {
-      height: 100%; font-family: sans-serif;
-      color: var(--text-main); background: var(--bg-main);
-    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body, html { height:100%; font-family:sans-serif; color:var(--text-main); background:var(--bg-main); }
 
     /* Sidebar */
     nav.sidebar {
-      position: fixed; top: 0; left: 0; bottom: 0;
-      width: var(--sidebar-width); background: var(--bg-sidebar);
-      color: var(--text-light); padding: 1.5rem 1rem;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--bg-sidebar);
+      color: var(--text-light);
+      padding: 1.5rem 1rem;
+      overflow-y: auto; /* Permite rolagem interna */
     }
     nav.sidebar h2 {
-      text-align: center; margin-bottom: 1.5rem; font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
     }
     nav.sidebar .tipo-form a {
-      display: block; margin-bottom: .75rem;
-      text-decoration: none; color: var(--text-light);
+      display: block;
+      margin-bottom: .75rem;
+      text-decoration: none;
+      color: var(--text-light);
       background: rgba(255,255,255,0.1);
-      padding: .5rem; border-radius: var(--border-radius);
+      padding: .5rem;
+      border-radius: var(--border-radius);
       transition: background .2s;
     }
     nav.sidebar .tipo-form a:hover {
@@ -44,12 +49,19 @@
     }
     nav.sidebar .btn-create,
     nav.sidebar .btn-logout {
-      display: block; width: 100%; text-align: center;
-      margin-bottom: 1rem; padding: .6rem;
-      background: var(--accent); color: var(--text-light);
-      border: none; border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow); transition: filter .2s;
-      cursor: pointer; text-decoration: none;
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+      padding: .6rem;
+      background: var(--accent);
+      color: var(--text-light);
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      transition: filter .2s;
+      cursor: pointer;
+      text-decoration: none;
     }
     nav.sidebar .btn-create:hover,
     nav.sidebar .btn-logout:hover {
@@ -58,7 +70,8 @@
 
     /* Main */
     .main {
-      margin-left: var(--sidebar-width); padding: 2rem;
+      margin-left: var(--sidebar-width);
+      padding: 2rem;
     }
 
     /* Scoreboards container */
@@ -71,8 +84,7 @@
     }
     .scoreboard {
       width: 100px; height: 100px; border-radius: 50%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       box-shadow: var(--box-shadow);
       color: var(--text-light);
       background: var(--bg-card);
@@ -88,17 +100,13 @@
       border-color: var(--meta-color);
     }
     .scoreboard .value {
-      font-size: 1.6rem;
-      line-height: 1;
+      font-size: 1.6rem; line-height: 1;
     }
     .scoreboard .label {
-      font-size: 0.75rem;
-      opacity: 0.8;
-      margin-top: 0.3rem;
-      text-transform: uppercase;
+      font-size: .75rem; opacity: .8; margin-top: .3rem; text-transform: uppercase;
     }
 
-    .main h2 {
+    .main h1 {
       text-align: center; margin-bottom: .5rem;
     }
     .main .subtitle {
@@ -153,15 +161,11 @@
       flex: 1; padding: 0 .75rem;
       background: #f5f5f5; border-radius: var(--border-radius);
       border: none; position: relative;
+      white-space: normal; overflow-wrap: break-word; word-break: break-all;
     }
-    .task-item .task-desc::after {
-      content: ""; position: absolute;
-      left: 0; top: 50%; height: 2px; width: 0;
-      background: #137333; transition: width .5s ease;
-      transform: translateY(-50%);
-    }
-    .task-item.feito .task-desc::after {
-      width: 100%;
+    .task-item.feito .task-desc {
+      text-decoration: line-through; text-decoration-color: #137333;
+      text-decoration-thickness: 2px; text-decoration-skip-ink: none;
     }
     .task-item .task-points {
       width: 80px; padding: .5rem;
@@ -199,53 +203,49 @@
     .back-btn:hover {
       filter: brightness(0.8);
     }
+
   </style>
 </head>
 <body>
 
   <nav class="sidebar">
-    <h2>Tarefas</h2>
+    <h2>Tarefas Ativas</h2>
     <form class="tipo-form" method="get">
-      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f">
-        <span style="font-size:1.2rem;vertical-align:middle;">＋</span>
-        Criar tarefa
-      </a>
+      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f">+ Criar tarefa</a>
       <a href="/graficos/" class="btn-create" style="background-color: #10a37f">Gráficos</a>
       <a href="/recomendacoes/" class="btn-create" style="background-color: #10a37f">Templates</a>
       {% for tipo in lista %}
-        <a href="/tipo/{{ tipo }}/" style="text-align: center;">{{ tipo }}</a>
+        <a href="/tipo/{{ tipo }}/">{{ tipo }}</a>
       {% endfor %}
     </form>
     <form action="{% url 'logout' %}" method="post" class="logout-form">
       {% csrf_token %}
-      <button type="submit" class="btn-logout" style="margin-top: 30px;">Sair</button>
+      <button type="submit" class="btn-logout">Sair</button>
     </form>
   </nav>
 
   <div class="main">
-
-    <!-- Scoreboards -->
     <div class="scoreboards">
       <div class="scoreboard total">
         <span class="value" id="scoreValue">{{ pontos }}</span>
-        <span class="label">Meta: {{ meta}}</span>
+        <span class="label">Meta: {{ meta }}</span>
       </div>
     </div>
 
-    <p class="subtitle">Clique em “Deletar” ou <strong>Feita</strong> para alternar o estado.</p>
+    <h1>{{ tipo }}</h1>
+    <p class="subtitle">Clique em “Deletar” ou “Feita” para alternar o estado.</p>
 
     <form method="post" class="task-form">
       {% csrf_token %}
-      <input type="text" name="tarefa" placeholder="Digite a tarefa"/>
-      <input type="number" name="pontos" placeholder="Pontuação" min="0"/>
+      <input type="text" name="tarefa" placeholder="Digite a tarefa" required/>
+      <input type="number" name="pontos" placeholder="Pontos" min="0" required/>
       <button type="submit">Adicionar</button>
     </form>
 
     <div class="task-list">
       {% for tarefa in tarefas %}
         <div class="task-item{% if tarefa.estado == 1 %} feito{% endif %}"
-             data-id="{{ tarefa.id }}"
-             data-score="{{ tarefa.pontos }}">
+             data-id="{{ tarefa.id }}" data-score="{{ tarefa.pontos }}">
           <div class="task-desc">{{ tarefa.tarefa }}</div>
           <div class="task-points">{{ tarefa.pontos }}</div>
           <div class="task-actions">
@@ -253,9 +253,8 @@
                     onclick="location.href='/anotacoes/{{ tarefa.id }}/apagar'">
               Deletar
             </button>
-            <a href="/anotacoes/{{ tarefa.id }}/estado">
-              <button type="button" class="btn-done">Feita</button>
-            </a>
+            <a href="/anotacoes/{{tarefa.id}}/estado">
+            <button type="button" class="btn-done">Feita</button></a>
           </div>
         </div>
       {% endfor %}
@@ -263,6 +262,20 @@
 
     <a href="/" class="back-btn">Histórico</a>
   </div>
+
+  <script>
+    const scoreEl = document.getElementById('scoreValue');
+    document.querySelectorAll('.task-item').forEach(item => {
+      const btn = item.querySelector('.btn-done');
+      btn.addEventListener('click', () => {
+        const pts = +item.dataset.score;
+        const done = item.classList.toggle('feito');
+        const current = +scoreEl.textContent;
+        scoreEl.textContent = done ? current + pts : current - pts;
+      });
+    });
+    
+  </script>
 
 </body>
 </html>

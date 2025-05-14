@@ -3,176 +3,470 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Gerenciador de Tarefas</title>
+  <title>Tarefas Compartilhadas</title>
   <style>
     :root {
-      --sidebar-width: 220px;
+      --sidebar-width: 200px;
       --accent: #10a37f;
       --bg-sidebar: #2f333d;
-      --bg-main: #f0f2f5;
-      --bg-card: #ffffff;
-      --text-main: #202124;
-      --text-light: #ffffff;
-      --border-radius: 8px;
-      --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      --bg-main: #f4f6f8;
+      --bg-container: #fff;
+      --text-main: #333;
+      --text-light: #fff;
+      --badge-accepted: #137333;
+      --badge-available: #d93025;
+      --border-radius: 10px;
+      --box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      --gap: 1rem;
+      --scroll-btn-size: 2.2rem;
+      --card-width: 260px;
+      --card-padding: 1.2rem;
     }
-    * { box-sizing: border-box; margin:0; padding:0; }
-    body, html { height:100%; font-family: sans-serif; color: var(--text-main); background: var(--bg-main); }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family:sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      height: 100%;
+    }
+    a, button { border: none; background: none; padding: 0; cursor: pointer; }
+    button:focus { outline: none; }
 
-    /* Sidebar */
     nav.sidebar {
-      position: fixed; top:0; left:0; bottom:0;
-      width: var(--sidebar-width); background: var(--bg-sidebar); color: var(--text-light);
-      padding: 1.5rem 1rem;
+      position:fixed;
+      top:0; left:0; bottom:0;
+      width:220px;
+      background:var(--bg-sidebar);
+      color:var(--text-light);
+
+      padding:1.5rem 1rem;
+      overflow-y:auto; /* permite rolar a lista */
     }
     nav.sidebar h2 {
-      margin-bottom: 1.5rem; font-size: 1.4rem; text-align: center;
-    }
-    nav.sidebar .tipo-form {
-      display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;
+      text-align:center;
+      margin-bottom:1.1rem;
+      font-size:1.4rem;
+      margin-top: 0.2rem;
+      margin-bottom: 1.3rem;
     }
     nav.sidebar .tipo-form a {
-      text-decoration: none; color: var(--text-light);
-      background: rgba(255,255,255,0.1);
-      padding: 0.5rem; border-radius: var(--border-radius);
-      text-align: center; transition: background 0.2s;
+      display:block;
+      margin-bottom:.15rem;
+      text-decoration:none;
+      color:var(--text-light);
+      background:rgba(255,255,255,0.1);
+      padding:.5rem;
+      border-radius:8px;
+      transition:background .2s;
+      
     }
     nav.sidebar .tipo-form a:hover {
-      background: rgba(255,255,255,0.2);
+      background:rgba(255,255,255,0.2);
+  
     }
+
     nav.sidebar .btn-create,
     nav.sidebar .btn-logout {
-      display: block; width: 100%;
-      text-align: center; margin-bottom: 1rem;
-      padding: 0.6rem; border: none; border-radius: var(--border-radius);
-      background: var(--accent); color: var(--text-light);
-      text-decoration: none; cursor: pointer;
-      box-shadow: var(--box-shadow); transition: filter 0.2s;
+      display:block;
+     
+      width:100%;
+      text-align:center;
+      margin-bottom:1rem;
+      padding:.6rem;
+      background:var(--accent);
+      color:var(--text-light);
+      border:none;
+      border-radius:var(--border-radius);
+      box-shadow:var(--box-shadow);
+      transition:filter .2s;
+      cursor:pointer;
+      text-decoration:none;
+      
     }
     nav.sidebar .btn-create:hover,
     nav.sidebar .btn-logout:hover {
-      filter: brightness(0.9);
+      filter:brightness(0.9);
+     
     }
-    nav.sidebar .logout-form button {
-      width: 100%; border: none; background: transparent; /* styled above */
+
+    .btn-create, .btn-logout {
+      display: block; width: 100%; margin-bottom: var(--gap);
+      padding: .6rem; background: var(--accent);
+      color: var(--text-light); border-radius: var(--border-radius);
+      text-align: center; transition: filter .2s;
+      border: 2px solid red;
     }
+    .btn-create:hover, .btn-logout:hover { filter: brightness(0.9); }
+    .btn-logout { background: rgba(255,255,255,0.1); }
+
+    .tipo-form {
+      display: flex; flex-direction: column;
+      gap: .6rem; margin-bottom: 5px;
+      
+    }
+    .tipo-form a {
+      padding: .5rem; background: rgba(255,255,255,0.1);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: background .2s;
+    }
+    .tipo-form a:hover { background: rgba(255,255,255,0.2); }
 
     /* Main */
-    .main {
-      margin-left: var(--sidebar-width); padding: 2rem;
+    .content {
+      margin-left: var(--sidebar-width);
+      padding: 2rem 1rem;
+      display: flex; justify-content: center;
     }
-    .scoreboard {
-      width: 100px; height: 100px; margin: auto;
-      border-radius: 50%; background: var(--accent); color: var(--text-light);
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background: var(--bg-container);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+    .container h1 {
+      margin: 0 0 var(--gap);
+      text-align: center;
+      color: var(--accent);
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    /* Column */
+    .task-column {
+      margin-bottom: 2rem;
+      position: relative;
+      margin-left: 10%; width: 80%;
+    }
+    .task-column h2 {
+      margin: 0 0 1rem;
+      font-size: 1.2rem; color: #444;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: .3rem;
+      width: 100%;
+      text-align: center;
+
+    }
+
+    /* Carousel */
+    .task-cards-inline {
+      display: flex;
+      overflow-x: auto;
+      gap: var(--gap);
+      scroll-snap-type: x mandatory;
+      padding-bottom: var(--gap);
+    }
+    .task-cards-inline::-webkit-scrollbar { display: none; }
+
+    .scroll-btn {
+      position: absolute; top: 50%;
+      width: var(--scroll-btn-size);
+      height: var(--scroll-btn-size);
+      background: rgba(0,0,0,0.3);
+      color: #fff; font-size: 1.2rem;
+      border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; font-weight: bold; box-shadow: var(--box-shadow);
-      margin-bottom: 1.5rem;
+      transform: translateY(-50%);
+      transition: background .2s;
+      z-index: 2;
     }
-    .main h2 {
-      text-align: center; margin-bottom: 0.5rem;
-    }
-    .main .subtitle {
-      text-align: center; font-size: 0.9rem; color: #555;
-      margin-bottom: 1.5rem;
-    }
+    .scroll-btn:hover { background: rgba(0,0,0,0.5); }
+    .scroll-btn.left { left: -1rem; }
+    .scroll-btn.right { right: -1rem; }
 
-    /* Form de criar tarefa */
-    .task-form {
-      display: flex; gap: 1rem; justify-content: center;
-      margin-bottom: 2rem; width: 70%; position: relative; left: 15%;
-    }
-    .task-form input[type="text"] {
-      flex: 1; padding: 0.75rem 1rem;
-      border: 1px solid #ccc; border-radius: var(--border-radius);
-    }
-    .task-form input[type="number"] {
-      width: 100px; padding: 0.75rem;
-      border: 1px solid #ccc; border-radius: var(--border-radius);
-    }
-    .task-form button {
-      background: var(--accent); color: var(--text-light);
-      border: none; border-radius: var(--border-radius);
-      padding: 0 1.5rem; cursor: pointer;
-      box-shadow: var(--box-shadow); transition: filter 0.2s;
-    }
-    .task-form button:hover { filter: brightness(0.9); }
-
-    /* Lista de tarefas */
-    .task-list {
-      display: flex; flex-direction: column; gap: 1rem;
-      max-width: 70%; margin: auto;
-    }
-    .task-item {
-      background: var(--bg-card); padding: 1rem;
-      border-radius: var(--border-radius); box-shadow: var(--box-shadow);
-      display: flex; align-items: center; gap: 1rem;
-    }
-    .task-item .task-desc {
-      flex: 1; padding: 0.5rem; border: none; background: #f5f5f5;
+    /* Cards */
+    .task-card {
+      flex: 0 0 var(--card-width);
+      scroll-snap-align: start;
+      background: #fff;
       border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      display: flex; flex-direction: column;
+      border-top: 6px solid var(--badge-available);
+      transition: transform .2s, box-shadow .2s;
     }
-    .task-item .task-points {
-      width: 80px; padding: 0.5rem; border: none; background: #e6f4ea;
-      color: #137333; font-weight: bold; text-align: center;
+    .task-card.accepted { border-top-color: var(--badge-accepted); }
+    .task-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+    .task-content {
+      padding: var(--card-padding);
+      display: flex; flex-direction: column;
+      gap: .6rem; flex: 1;
+    }
+    .task-content h3 {
+      margin: 0; font-size: 1.1rem; font-weight: 600;
+    }
+    .task-content .tags {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+    }
+    .task-content .tag {
+      background: #eef; color: #225;
+      padding: .2rem .5rem;
       border-radius: var(--border-radius);
+      font-size: .8rem;
     }
-    .task-actions {
-      display: flex; gap: 0.5rem;
+    .task-content .author,
+    .task-content .deadline {
+      font-size: .85rem; color: #666;
+      display: flex; align-items: center; gap: .4rem;
     }
-    .task-actions a button {
-      border: none; background: var(--accent); color: var(--text-light);
-      padding: 0.4rem 0.8rem; border-radius: var(--border-radius);
-      cursor: pointer; box-shadow: var(--box-shadow);
-      transition: filter 0.2s;
+    .task-content .author::before { content: "👤"; }
+    .task-content .deadline::before { content: "⏰"; }
+    .task-content p {
+      margin: 0; font-size: .9rem; line-height: 1.4; color: #444;
     }
-    .task-actions a .btn-delete:hover { filter: brightness(1.1); background: #d93025; }
-    .task-actions a .btn-done:hover   { filter: brightness(0.9); background: #137333; }
+    .card-actions {
+      display: flex; gap: .5rem;
+      padding: 0 var(--card-padding) var(--card-padding);
+    }
+    .btn-accept, .btn-view {
+      flex: 1; padding: .5rem 0;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--border-radius);
+      text-align: center; font-size: .9rem;
+      transition: filter .2s;
+    }
+    .btn-accept[disabled] {
+      background: var(--badge-accepted);
+      opacity: .7; cursor: default;
+    }
+    .btn-accept:not([disabled]):hover,
+    .btn-view:hover { filter: brightness(0.9); }
+    .btn-view { background: #555; }
 
-    /* Voltar */
     .back-btn {
-      display: block; text-align: center; margin: 4rem auto 0;
-      text-decoration: none; padding: 0.6rem 1.2rem;
-      background: #555; color: var(--text-light);
-      border-radius: var(--border-radius); box-shadow: var(--box-shadow);
-      transition: filter 0.2s; width: 15%;
-      margin-left: 47%;
-      
+      display: inline-block;
+      margin: 1.5rem auto 0;
+      padding: .6rem 1.2rem;
+      background: #555; color: #fff;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      transition: filter .2s;
+
     }
     .back-btn:hover { filter: brightness(0.8); }
   </style>
 </head>
 <body>
 
-    <nav class="sidebar">
+  <nav class="sidebar">
     <h2>Tarefas</h2>
     <form class="tipo-form" method="get">
-      <a href="/nova_tarefa/" style="background-color: #10a37f"> <span style="font-size:1.2rem;vertical-align:middle;" >＋</span> Criar tarefa</a>
-      <a href="/graficos/"  style="background-color: #10a37f"> Gráficos </a>
-      <a href="/recomendacoes/"  style="background-color: #10a37f"> Templates </a>
+      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f">+ Criar tarefa</a>
+      <a href="/graficos/" class="btn-create" style="background-color: #10a37f">Gráficos</a>
+      <a href="/recomendacoes/" class="btn-create" style="background-color: #10a37f">Templates</a>
       {% for tipo in lista %}
         <a href="/tipo/{{ tipo }}/">{{ tipo }}</a>
       {% endfor %}
     </form>
     <form action="{% url 'logout' %}" method="post" class="logout-form">
       {% csrf_token %}
-      <button type="submit" class="btn-logout" style="background: rgba(255,255,255,0.1);">Sair</button>
+      <button type="submit" class="btn-logout" style="margin-top:.6rem;">Sair</button>
     </form>
-    </nav>
+  </nav>
 
-    <section class="content" style="width: 70%; margin-left: 20%; text-align: center; margin-top: 5%;">
-      <h1 style="margin-bottom: 20px;">Em breve aqui você:</h1>
-      <h2>Poderá receberá tarefas de outros para que faça.</h2>
-      <h2>Poderá se inspirar nas tarefas de outras pessoas.</h2>
-      <h2>Poderá fazer e compartilhar tarefas.</h2>
-      <h2>Poderá compartilhar seu sucesso nas tarefas.</h2>
-    </section>
-    <a class="back-btn" href="/">Voltar</a>
+
+  <div class="content">
+    <div class="container">
+      <h1>Tarefas Compartilhadas</h1>
+
+      <!-- Estudo -->
+      <div class="task-column" >
+        <h2>Estudo</h2>
+        <button class="scroll-btn left" data-target="estudo-carousel">‹</button>
+        <div class="task-cards-inline" id="estudo-carousel">
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Revisão de Cálculo</h3>
+              <div class="tags"><div class="tag">Estudo</div></div>
+              <div class="author">Prof. Almeida</div>
+              <div class="deadline">18/05/2025</div>
+              <p>Resolver exercícios de integrais definidas.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Prática de Java</h3>
+              <div class="tags"><div class="tag">Estudo</div></div>
+              <div class="author">Prof. Bruno</div>
+              <div class="deadline">20/05/2025</div>
+              <p>Implementar classes e herança em Java.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Leitura de Literatura</h3>
+              <div class="tags"><div class="tag">Estudo</div></div>
+              <div class="author">Prof. Clara</div>
+              <div class="deadline">22/05/2025</div>
+              <p>Analisar poema “Soneto de Fidelidade”.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Exercícios de Álgebra</h3>
+              <div class="tags"><div class="tag">Estudo</div></div>
+              <div class="author">Prof. Diego</div>
+              <div class="deadline">24/05/2025</div>
+              <p>Resolver sistemas e matrizes.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+        </div>
+        <button class="scroll-btn right" data-target="estudo-carousel">›</button>
+      </div>
+
+      <!-- Trabalho -->
+      <div class="task-column">
+        <h2>Trabalho</h2>
+        <button class="scroll-btn left" data-target="trabalho-carousel">‹</button>
+        <div class="task-cards-inline" id="trabalho-carousel">
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Planejar Reunião Q3</h3>
+              <div class="tags"><div class="tag">Trabalho</div></div>
+              <div class="author">Equipe de Projeto</div>
+              <div class="deadline">16/05/2025</div>
+              <p>Definir pauta e objetivos.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Relatório Mensal</h3>
+              <div class="tags"><div class="tag">Trabalho</div></div>
+              <div class="author">Gestão</div>
+              <div class="deadline">19/05/2025</div>
+              <p>Compilar dados e enviar ao board.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Testes de QA</h3>
+              <div class="tags"><div class="tag">Trabalho</div></div>
+              <div class="author">Time QA</div>
+              <div class="deadline">21/05/2025</div>
+              <p>Executar casos de teste no release v1.2.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+        </div>
+        <button class="scroll-btn right" data-target="trabalho-carousel">›</button>
+      </div>
+
+      <!-- Sono -->
+      <div class="task-column">
+        <h2>Sono</h2>
+        <button class="scroll-btn left" data-target="sono-carousel">‹</button>
+        <div class="task-cards-inline" id="sono-carousel">
+          <div class="task-card accepted">
+            <div class="task-content">
+              <h3>Registrar Horas</h3>
+              <div class="tags"><div class="tag">Sono</div></div>
+              <div class="author">Bem-estar</div>
+              <div class="deadline">14/05/2025</div>
+              <p>Anotar hora de dormir e acordar.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept" disabled>✔ Aceita</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Dormir 8h</h3>
+              <div class="tags"><div class="tag">Sono</div></div>
+              <div class="author">Bem-estar</div>
+              <div class="deadline">21/05/2025</div>
+              <p>Praticar rotina regular de sono.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+        </div>
+        <button class="scroll-btn right" data-target="sono-carousel">›</button>
+      </div>
+
+      <!-- Desenvolvimento Pessoal -->
+      <div class="task-column">
+        <h2>Desenv. Pessoal</h2>
+        <button class="scroll-btn left" data-target="desenv-carousel">‹</button>
+        <div class="task-cards-inline" id="desenv-carousel">
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Ler UX Basics</h3>
+              <div class="tags"><div class="tag">Pessoal</div></div>
+              <div class="author">Mentor</div>
+              <div class="deadline">22/05/2025</div>
+              <p>Estudar princípios de UX.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+          <div class="task-card available">
+            <div class="task-content">
+              <h3>Meditação Diária</h3>
+              <div class="tags"><div class="tag">Pessoal</div></div>
+              <div class="author">Bem-estar</div>
+              <div class="deadline">17/05/2025</div>
+              <p>Meditar 10 minutos por dia.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accept">Aceitar</button>
+              <button class="btn-view">Ver</button>
+            </div>
+          </div>
+        </div>
+        <button class="scroll-btn right" data-target="desenv-carousel">›</button>
+      </div>
+      <a href="/" class="back-btn" style="margin-left: 10%;">Voltar</a>
+      
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.scroll-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        const offset = btn.classList.contains('left') ? -300 : 300;
+        target.scrollBy({ left: offset, behavior: 'smooth' });
+      });
+    });
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-    

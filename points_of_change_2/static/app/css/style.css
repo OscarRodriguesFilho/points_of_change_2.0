@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Gerenciador de Tarefas</title>
-  <style>
+
     :root {
       --sidebar-width: 220px;
       --accent: #10a37f;
@@ -58,8 +52,8 @@
       display:block;
       width:100%;
       text-align:center;
-      margin-bottom:0.7rem;
-      padding:.4rem;
+      margin-bottom:1rem;
+      padding:.6rem;
       background:var(--accent);
       color:var(--text-light);
       border:none;
@@ -249,77 +243,3 @@
     .back-btn:hover {
       filter:brightness(0.8);
     }
-  </style>
-</head>
-<body>
-
-  <nav class="sidebar">
-    <h2>Tarefas</h2>
-    <form class="tipo-form" method="get">
-      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f;">＋ Criar tarefa</a>
-      <a href="/graficos/" class="btn-create" style="background-color: #10a37f;">Gráficos</a>
-      <a href="/recomendacoes/" class="btn-create" style="background-color: #10a37f;">Templates</a>
-      {% for tipo in lista %}
-        <a href="/tipo/{{ tipo }}/">{{ tipo }}</a>
-      {% endfor %}
-    </form>
-    <form action="{% url 'logout' %}" method="post" class="logout-form">
-      {% csrf_token %}
-      <button type="submit" class="btn-logout" style="margin-top:0.7rem; padding: 9px">Sair</button>
-    </form>
-  </nav>
-
-  <div class="main">
-    <div class="scoreboard">
-      <span class="value" id="scoreValue">{{ pontos }}</span>
-      <span class="label">Total</span>
-    </div>
-
-    <h2>Histórico de tarefas</h2>
-    <p class="subtitle">Clique em “Deletar” ou “Feita” para alternar o estado.</p>
-
-    <form method="post" class="task-form">
-      {% csrf_token %}
-      <input type="text" name="tarefa" required placeholder="Digite a tarefa"/ >
-      <input type="number" name="pontos" required placeholder="Pontos" min="0"/>
-      <button type="submit">Adicionar</button>
-    </form>
-
-    <div class="task-list">
-      {% for tarefa in tarefas %}
-        <div class="task-item{% if tarefa.estado == 1 %} feito{% endif %}"
-             data-id="{{ tarefa.id }}" data-score="{{ tarefa.pontos }}">
-          <div class="task-desc">{{ tarefa.tarefa }}</div>
-          <div class="task-points">{{ tarefa.pontos }}</div>
-          <div class="task-actions">
-            <button type="button" class="btn-delete"
-                    onclick="location.href='/anotacoes/{{ tarefa.id }}/apagar'">
-              Deletar
-            </button>
-            <a href="/anotacoes/{{tarefa.id}}/estado">
-            <button type="button" class="btn-done">Feita</button></a>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-
-    <a href="/" class="back-btn">Subir</a>
-  </div>
-
-  <script>
-    const scoreEl = document.getElementById('scoreValue');
-    document.querySelectorAll('.task-item').forEach(item => {
-      const btn = item.querySelector('.btn-done');
-      btn.addEventListener('click', () => {
-        const pts = +item.dataset.score;
-        const done = item.classList.toggle('feito');
-        const current = +scoreEl.textContent;
-        scoreEl.textContent = done ? current + pts : current - pts;
-      });
-    });
-
-  </script>
-
-</body>
-</html>
-

@@ -24,7 +24,7 @@ class Tarefa(models.Model):
         default=False,
         verbose_name='Estado'
     )
-    tipo = models.CharField(max_length=20, default="i")
+    tipo = models.CharField(max_length=20, default="Avulso")
     data = models.DateTimeField(auto_now_add=True)
     
 
@@ -34,5 +34,5 @@ class Tarefa(models.Model):
 
 class Novo_tipo(models.Model):
     author = models.ForeignKey("auth.User", on_delete=models.CASCADE,  default=1)
-    nome = models.TextField(verbose_name='Descrição da lista')
-    meta = models.PositiveIntegerField(verbose_name='Meta')
+    nome = models.TextField(verbose_name='Descrição da lista', default="Avulso")
+    meta = models.PositiveIntegerField(verbose_name='Meta', default="0")
