@@ -40,6 +40,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+   
+]
+STATIC_URL = '/static/'
+
+# Se seu diretório “static/” está na raiz do projeto (ao lado de manage.py),
+# adicione também:
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
 ]
 
 MIDDLEWARE = [

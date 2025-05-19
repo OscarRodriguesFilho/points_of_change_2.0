@@ -1,5 +1,4 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
-
 from django.http import HttpResponse
 from django.db.models import Sum
 from .models import Tarefa, Novo_tipo
