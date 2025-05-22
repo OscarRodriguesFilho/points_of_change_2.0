@@ -218,7 +218,6 @@ nav.sidebar .btn-logout:hover {
     padding: 0 var(--card-padding) var(--card-padding);
 }
 .btn-accept, .btn-view {
-    flex: 1; padding: .5rem 0;
     background: var(--accent);
     color: #fff;
     border-radius: var(--border-radius);
@@ -244,3 +243,37 @@ nav.sidebar .btn-logout:hover {
 
 }
 .back-btn:hover { filter: brightness(0.8); }
+  
+.btn-plus {
+    font-size: 2rem;
+    background: #10a37f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    cursor: pointer;
+    z-index: 1001;
+}
+.form-popup {
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 1001;
+    border-radius: 10px;
+}
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}

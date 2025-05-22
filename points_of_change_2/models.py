@@ -2,6 +2,35 @@ from django.db import models
 
 # Create your models here.
 
+from django.db import models
+from django.db import models
+from django.contrib.auth.models import User
+
+class Like(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    recomendacao = models.ForeignKey('Recomendacao', on_delete=models.CASCADE, related_name='likes')
+
+    class Meta:
+        unique_together = ('usuario', 'recomendacao')  # impede múltiplos likes do mesmo user
+
+
+
+class Recomendacao(models.Model):
+    titulo = models.CharField(max_length=200)
+    autor = models.CharField(max_length=100)
+    data_publicacao = models.DateField()
+    descricao = models.TextField()
+    categoria = models.CharField(max_length=50)
+
+    nome_postador = models.CharField(max_length=100)
+    cargo_postador = models.CharField(max_length=100)
+
+    arquivo = models.FileField(upload_to='recomendacoes_pdfs/')
+
+    def __str__(self):
+        return self.titulo
+
+
 
 
 class Tarefa(models.Model):

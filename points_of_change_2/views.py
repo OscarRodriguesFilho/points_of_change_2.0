@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+
 from django.http import HttpResponse
 from django.db.models import Sum
 from .models import Tarefa, Novo_tipo
@@ -6,8 +7,75 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 # É aqui que ficarão as funções que você criou
 from django.shortcuts import render, redirect
-from .forms import RegistroForm
+from .forms import RegistroForm, RecomendacaoForm
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from .models import Recomendacao
+from .forms import RecomendacaoForm
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import Recomendacao, Like
+
+
+@login_required
+def like_toggle(request, recomendacao_id):
+    if request.method == 'POST':
+        recomendacao = Recomendacao.objects.get(id=recomendacao_id)
+        like, created = Like.objects.get_or_create(
+            usuario=request.user,
+            recomendacao=recomendacao
+        )
+
+        if not created:
+            like.delete()  # se já curtiu, descurte
+
+        total_likes = recomendacao.likes.count()
+        return JsonResponse({'likes': total_likes})
+
+
+
+
+from collections import defaultdict
+from django.shortcuts import render, redirect
+from .models import Recomendacao
+from .forms import RecomendacaoForm
+import unicodedata
+
+def slug_categoria(categoria):
+    # Remove acentos, converte para minúsculo e tira espaços extras
+    categoria = unicodedata.normalize('NFKD', categoria).encode('ASCII', 'ignore').decode('ASCII')
+    return categoria.strip().lower()
+
+def recomendacoes_unificadas_view(request):
+    if request.method == 'POST':
+        form = RecomendacaoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('recomendacoes')
+    else:
+        form = RecomendacaoForm()
+
+    cards = Recomendacao.objects.all().order_by('-data_publicacao')
+    categorias = defaultdict(list)
+
+    for card in cards:
+        chave_normalizada = slug_categoria(card.categoria)
+        categorias[chave_normalizada].append(card)
+
+    # Agora, crie um dicionário que preserve o nome original da categoria para exibição
+    categorias_exibicao = {}
+    for chave, cards_lista in categorias.items():
+        nome_original = cards_lista[0].categoria  # nome original para exibição no HTML
+        categorias_exibicao[nome_original] = cards_lista
+
+    return render(request, 'paginas/recomendacoes.html', {
+        'categorias': categorias_exibicao,
+        'form': form
+    })
+
+
+
+
 
 def registro(request):
     if request.method == 'POST':
@@ -19,6 +87,8 @@ def registro(request):
     else:
         form = RegistroForm()
     return render(request, 'paginas/registro.html', {'form': form})
+
+        
 
 @login_required
 def index(request):

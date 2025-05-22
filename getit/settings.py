@@ -25,7 +25,7 @@ LOGOUT_REDIRECT_URL = '/'
 SECRET_KEY = 'django-insecure-en5q$d(vau^@z4)^xp$+khbtcng1pt3p-k=8cy*)4s5uywnkzq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,6 +47,9 @@ STATIC_URL = '/static/'
 # Se seu diretório “static/” está na raiz do projeto (ao lado de manage.py),
 # adicione também:
 from pathlib import Path
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATICFILES_DIRS = [
@@ -136,3 +139,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

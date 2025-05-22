@@ -1,226 +1,458 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <link rel="stylesheet" href="{% static 'app/css/style_recomendacoes.css' %}">
-  <title>Tarefas Compartilhadas</title>
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Experiências - Qualidade de Sono</title>
+  <style>
+    :root {
+      --primary-blue: #3498db;
+      --primary-blue-dark: #2980b9;
+      --light-blue: #e1f5fe;
+      --text-dark: #2c3e50;
+      --text-muted: #7f8c8d;
+      --bg-light: #f5f5f5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; display: flex; height: 100vh; background: var(--bg-light); }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: var(--text-dark);
+      color: #ecf0f1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+    .sidebar h2 { font-size: 1.4rem; margin-bottom: 1rem; }
+    .sidebar button {
+      margin: 0.25rem 0;
+      padding: 0.6rem;
+      font-size: 0.95rem;
+      color: #ecf0f1;
+      background: var(--primary-blue);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-align: left;
+    }
+    .sidebar button:hover { background: var(--primary-blue-dark); }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+    .section-title {
+      position: relative;
+      margin: 2rem 0 1rem;
+      text-align: center;
+      font-size: 1.6rem;
+      color: var(--text-dark);
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 120px;
+      height: 2px;
+      background: var(--primary-blue);
+      margin: 0.5rem auto 0;
+    }
+
+    /* Carousel */
+    .carousel-container { position: relative; margin-bottom: 2rem; }
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 1rem;
+      padding-bottom: 1rem;
+    }
+    .carousel::-webkit-scrollbar { height: 8px; }
+    .carousel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: var(--primary-blue);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .arrow.left { left: -16px; }
+    .arrow.right { right: -16px; }
+
+    /* Card */
+    .card {
+      flex: 0 0 260px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .card::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 6px;
+      background: var(--primary-blue);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    .card-content {
+      padding: 0.8rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-content img {
+      width: 100%;
+      border-radius: 4px;
+      margin-bottom: 0.6rem;
+    }
+    .card-content h4 {
+      margin-bottom: 0.4rem;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+    }
+    .pill {
+      display: inline-block;
+      background: var(--light-blue);
+      color: var(--primary-blue-dark);
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 12px;
+      margin-bottom: 0.6rem;
+    }
+    .meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    .description {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      margin-bottom: 0.8rem;
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.8rem 0.8rem;
+    }
+    .card-actions .left {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .card-actions .heart { color: var(--primary-blue); cursor: pointer; }
+    .card-actions .buttons { display: flex; gap: 0.4rem; }
+    .card-actions button {
+      padding: 0.4rem 0.7rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      color: #fff;
+    }
+    .btn-comentarios { background: var(--text-muted); }
+    .btn-comentarios:hover { background: #616161; }
+    .btn-ver        { background: var(--text-muted); }
+    .btn-ver:hover  { background: #616161; }
+    .btn-seguir     { background: var(--primary-blue); }
+    .btn-seguir:hover { background: var(--primary-blue-dark); }
+
+    /* Comments Panel */
+    .comments-panel {
+      display: none;
+      border-top: 1px solid #ddd;
+      background: #fafafa;
+      padding: 0.8rem;
+    }
+    .comments-panel h5 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
+    }
+    .comments-panel ul {
+      list-style: none;
+      max-height: 150px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .comments-panel li {
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
 </head>
 <body>
+  <aside class="sidebar">
+    <h2>Menu</h2>
+    <button>Dashboard</button>
+    <button>Saiba mais</button>
+    <button>Contato</button>
+    <button>Blog</button>
+    <button>Outros profissionais</button>
+    <button>Seu perfil</button>
+  </aside>
 
-  <nav class="sidebar">
-    <h2>Tarefas</h2>
-    <form class="tipo-form" method="get">
-      <a href="/nova_tarefa/" class="btn-create" style="background-color: #10a37f">+ Criar tarefa</a>
-      <a href="/graficos/" class="btn-create" style="background-color: #10a37f">Gráficos</a>
-      <a href="/recomendacoes/" class="btn-create" style="background-color: #10a37f">Templates</a>
-      {% for tipo in lista %}
-        <a href="/tipo/{{ tipo }}/">{{ tipo }}</a>
-      {% endfor %}
-    </form>
-    <form action="{% url 'logout' %}" method="post" class="logout-form">
-      {% csrf_token %}
-      <button type="submit" class="btn-logout" style="margin-top:.6rem;">Sair</button>
-    </form>
-  </nav>
-
-
-  <div class="content">
-    <div class="container">
-      <h1>Tarefas Compartilhadas</h1>
-
-      <!-- Estudo -->
-      <div class="task-column" >
-        <h2>Estudo</h2>
-        <button class="scroll-btn left" data-target="estudo-carousel">‹</button>
-        <div class="task-cards-inline" id="estudo-carousel">
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Revisão de Cálculo</h3>
-              <div class="tags"><div class="tag">Estudo</div></div>
-              <div class="author">Prof. Almeida</div>
-              <div class="deadline">18/05/2025</div>
-              <p>Resolver exercícios de integrais definidas.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
+  <main class="main">
+    <!-- Medicina -->
+    <section class="carousel-container">
+      <div class="section-title">Medicina</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=Medicina" alt="Medicina">
+            <h4>Consulta Noturna</h4>
+            <span class="pill">Medicina</span>
+            <div class="meta">👤 Dr. Silva • 12/05/2025</div>
+            <div class="description">Atendimento especializado para distúrbios do sono.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 15</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
             </div>
           </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Prática de Java</h3>
-              <div class="tags"><div class="tag">Estudo</div></div>
-              <div class="author">Prof. Bruno</div>
-              <div class="deadline">20/05/2025</div>
-              <p>Implementar classes e herança em Java.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
-          </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Leitura de Literatura</h3>
-              <div class="tags"><div class="tag">Estudo</div></div>
-              <div class="author">Prof. Clara</div>
-              <div class="deadline">22/05/2025</div>
-              <p>Analisar poema “Soneto de Fidelidade”.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
-          </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Exercícios de Álgebra</h3>
-              <div class="tags"><div class="tag">Estudo</div></div>
-              <div class="author">Prof. Diego</div>
-              <div class="deadline">24/05/2025</div>
-              <p>Resolver sistemas e matrizes.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Ótimo atendimento, me ajudou muito! – Usuário A</li>
+              <li>Muito atencioso e profissional. – Usuário B</li>
+            </ul>
           </div>
         </div>
-        <button class="scroll-btn right" data-target="estudo-carousel">›</button>
       </div>
+    </section>
 
-      <!-- Trabalho -->
-      <div class="task-column">
-        <h2>Trabalho</h2>
-        <button class="scroll-btn left" data-target="trabalho-carousel">‹</button>
-        <div class="task-cards-inline" id="trabalho-carousel">
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Planejar Reunião Q3</h3>
-              <div class="tags"><div class="tag">Trabalho</div></div>
-              <div class="author">Equipe de Projeto</div>
-              <div class="deadline">16/05/2025</div>
-              <p>Definir pauta e objetivos.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
+    <!-- Nutrição -->
+    <section class="carousel-container">
+      <div class="section-title">Nutrição</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=Nutrição" alt="Nutrição">
+            <h4>Dieta Equilibrada</h4>
+            <span class="pill">Nutrição</span>
+            <div class="meta">👤 Nutricionista • 10/05/2025</div>
+            <div class="description">Plano alimentar rico em triptofano para melhorar o sono.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 8</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
             </div>
           </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Relatório Mensal</h3>
-              <div class="tags"><div class="tag">Trabalho</div></div>
-              <div class="author">Gestão</div>
-              <div class="deadline">19/05/2025</div>
-              <p>Compilar dados e enviar ao board.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
-          </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Testes de QA</h3>
-              <div class="tags"><div class="tag">Trabalho</div></div>
-              <div class="author">Time QA</div>
-              <div class="deadline">21/05/2025</div>
-              <p>Executar casos de teste no release v1.2.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Adorei a sugestão de frutas à noite! – Usuário C</li>
+              <li>Funcionou bem para mim. – Usuário D</li>
+            </ul>
           </div>
         </div>
-        <button class="scroll-btn right" data-target="trabalho-carousel">›</button>
       </div>
+    </section>
 
-      <!-- Sono -->
-      <div class="task-column">
-        <h2>Sono</h2>
-        <button class="scroll-btn left" data-target="sono-carousel">‹</button>
-        <div class="task-cards-inline" id="sono-carousel">
-          <div class="task-card accepted">
-            <div class="task-content">
-              <h3>Registrar Horas</h3>
-              <div class="tags"><div class="tag">Sono</div></div>
-              <div class="author">Bem-estar</div>
-              <div class="deadline">14/05/2025</div>
-              <p>Anotar hora de dormir e acordar.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept" disabled>✔ Aceita</button>
-              <button class="btn-view">Ver</button>
+    <!-- Exercício físico -->
+    <section class="carousel-container">
+      <div class="section-title">Exercício físico</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=Exerc%C3%ADcio+F%C3%ADsico" alt="Exercício físico">
+            <h4>Alongamento Noturno</h4>
+            <span class="pill">Exercício físico</span>
+            <div class="meta">👤 Instrutor • 14/05/2025</div>
+            <div class="description">Rotina leve de alongamentos antes de dormir.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 12</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
             </div>
           </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Dormir 8h</h3>
-              <div class="tags"><div class="tag">Sono</div></div>
-              <div class="author">Bem-estar</div>
-              <div class="deadline">21/05/2025</div>
-              <p>Praticar rotina regular de sono.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Me ajudou a relaxar. – Usuário E</li>
+              <li>Simples e eficaz! – Usuário F</li>
+            </ul>
           </div>
         </div>
-        <button class="scroll-btn right" data-target="sono-carousel">›</button>
       </div>
+    </section>
 
-      <!-- Desenvolvimento Pessoal -->
-      <div class="task-column">
-        <h2>Desenv. Pessoal</h2>
-        <button class="scroll-btn left" data-target="desenv-carousel">‹</button>
-        <div class="task-cards-inline" id="desenv-carousel">
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Ler UX Basics</h3>
-              <div class="tags"><div class="tag">Pessoal</div></div>
-              <div class="author">Mentor</div>
-              <div class="deadline">22/05/2025</div>
-              <p>Estudar princípios de UX.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
+    <!-- Medicação -->
+    <section class="carousel-container">
+      <div class="section-title">Medicação</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=Medica%C3%A7%C3%A3o" alt="Medicação">
+            <h4>Melatonina Natural</h4>
+            <span class="pill">Medicação</span>
+            <div class="meta">👤 Farmacêutico • 16/05/2025</div>
+            <div class="description">Suplemento natural para regular o ciclo do sono.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 20</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
             </div>
           </div>
-          <div class="task-card available">
-            <div class="task-content">
-              <h3>Meditação Diária</h3>
-              <div class="tags"><div class="tag">Pessoal</div></div>
-              <div class="author">Bem-estar</div>
-              <div class="deadline">17/05/2025</div>
-              <p>Meditar 10 minutos por dia.</p>
-            </div>
-            <div class="card-actions">
-              <button class="btn-accept">Aceitar</button>
-              <button class="btn-view">Ver</button>
-            </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Muito bom, senti diferença. – Usuário G</li>
+              <li>Recomendo moderação. – Usuário H</li>
+            </ul>
           </div>
         </div>
-        <button class="scroll-btn right" data-target="desenv-carousel">›</button>
       </div>
-      <a href="/" class="back-btn" style="margin-left: 10%;">Voltar</a>
-      
-    </div>
-  </div>
+    </section>
+
+    <!-- Médicos -->
+    <section class="carousel-container">
+      <div class="section-title">Médicos</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=M%C3%A9dicos" alt="Médicos">
+            <h4>Clínica do Sono</h4>
+            <span class="pill">Médicos</span>
+            <div class="meta">👤 Dra. Almeida • 18/05/2025</div>
+            <div class="description">Especialistas em distúrbios do sono e apneia.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 5</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
+            </div>
+          </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Atendimento excelente. – Usuário I</li>
+              <li>Equipe muito dedicada. – Usuário J</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meditação -->
+    <section class="carousel-container">
+      <div class="section-title">Meditação</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=Medita%C3%A7%C3%A3o" alt="Meditação">
+            <h4>Mindfulness Noturno</h4>
+            <span class="pill">Meditação</span>
+            <div class="meta">👤 Instrutor • 20/05/2025</div>
+            <div class="description">Sessões guiadas de 10 minutos antes de dormir.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 9</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
+            </div>
+          </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Me relaxa instantaneamente. – Usuário K</li>
+              <li>Boa para iniciantes. – Usuário L</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Soluções naturais -->
+    <section class="carousel-container">
+      <div class="section-title">Soluções naturais</div>
+      <div class="arrow left">‹</div>
+      <div class="arrow right">›</div>
+      <div class="carousel">
+        <div class="card">
+          <div class="card-content">
+            <img src="https://via.placeholder.com/260x140/3498db/ffffff?text=Solu%C3%A7%C3%B5es+Naturais" alt="Soluções naturais">
+            <h4>Chá de Camomila</h4>
+            <span class="pill">Soluções naturais</span>
+            <div class="meta">👤 Herbalista • 22/05/2025</div>
+            <div class="description">Receita tradicional para relaxamento antes do sono.</div>
+          </div>
+          <div class="card-actions">
+            <div class="left"><span class="heart">❤</span> 11</div>
+            <div class="buttons">
+              <button class="btn-comentarios">Comentários</button>
+              <button class="btn-ver">Ver</button>
+              <button class="btn-seguir">Seguir</button>
+            </div>
+          </div>
+          <div class="comments-panel">
+            <h5>Comentários</h5>
+            <ul>
+              <li>Simples e eficaz! – Usuário M</li>
+              <li>Adoro o aroma. – Usuário N</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    document.querySelectorAll('.scroll-btn').forEach(btn => {
+    // Toggle comments panels
+    document.querySelectorAll('.btn-comentarios').forEach(btn => {
       btn.addEventListener('click', () => {
-        const target = document.getElementById(btn.dataset.target);
-        const offset = btn.classList.contains('left') ? -300 : 300;
-        target.scrollBy({ left: offset, behavior: 'smooth' });
+        const card = btn.closest('.card');
+        const panel = card.querySelector('.comments-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
       });
     });
   </script>
